@@ -1,103 +1,421 @@
-🐝 BeaHive Caregiver Control
-Soft but clear PD + BP + Medication Tracker
-Caregiver note: This tracker is for organizing home information only. It does not replace the PD nurse, nephrologist, cardiology team, or emergency instructions.
-✅ Button Test
-Tap this first. If the green message appears, your browser is allowing the tracker buttons to work.
-Test Buttons
-📅 Treatment Date
-🌙 Night Setup / Pre-Treatment
-Use before starting the cycler at night.
-Start Time
-Pre Weight
-Before connecting
-lbs
-Dry Weight
-lbs
-Pre BP
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeaHive Caregiver Control v6</title>
+<style>
+:root{
+  --bg:#f0f4ff;--card:#fff;--primary:#4f6ef7;--primary2:#7d5cff;--light:#eef0ff;
+  --pink:#ff6b9d;--green:#22c97a;--greenL:#e6faf2;--yellow:#f7c948;--yellowL:#fffbea;
+  --red:#ff5c5c;--redL:#fff0f0;--purple:#7c3aed;--purpleL:#f5f0ff;--text:#1a1a2e;
+  --muted:#7d849c;--border:#e4e8f7;--shadow:0 4px 24px rgba(79,110,247,.10)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);padding:14px;line-height:1.35}
+header{background:linear-gradient(135deg,var(--primary),var(--primary2));color:white;border-radius:22px;padding:22px 16px;text-align:center;box-shadow:var(--shadow);margin-bottom:14px}
+h1{font-size:1.45rem;margin-bottom:4px}
+header p{font-size:.86rem;opacity:.92}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:16px;margin-bottom:13px;box-shadow:var(--shadow)}
+.note{font-size:.78rem;color:var(--muted);border:1.5px dashed var(--muted);border-radius:12px;padding:11px;background:white;margin-bottom:13px}
+.section-title{font-weight:900;font-size:1rem;margin-bottom:3px}
+.section-sub{font-size:.76rem;color:var(--muted);margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.label{font-weight:700;font-size:.88rem;flex:1}
+.label small{display:block;color:var(--muted);font-weight:400;font-size:.74rem}
+input,select,textarea{border:1.5px solid var(--border);background:var(--bg);border-radius:9px;padding:8px;font-weight:700;max-width:140px}
+textarea{width:100%;max-width:100%;height:76px;margin-top:8px;font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.field label{display:block;color:var(--muted);font-size:.72rem;font-weight:800;text-transform:uppercase;margin-bottom:4px}
+.field input,.field select{width:100%;max-width:100%;text-align:left}
+.bp{display:flex;align-items:center;gap:4px}.bp input{width:62px}
+.alert{display:none;margin-top:8px;border-radius:10px;padding:9px;font-size:.78rem;font-weight:800}
+.alert.show{display:block}.good{background:var(--greenL);border:1.5px solid var(--green);color:#0a7a4a}.warn{background:#fff3e0;border:1.5px solid #f59e0b;color:#92400e}.danger{background:var(--redL);border:1.5px solid var(--red);color:#9b1c1c}
+.fluidBox{text-align:center;background:var(--light);border-radius:13px;padding:12px;margin-bottom:8px}.fluidAmt{font-size:2rem;color:var(--primary);font-weight:900}
+.btnGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;border:none;border-radius:10px;font-weight:900;padding:10px 7px}
+.fluidBtn,.outlineBtn{background:var(--light);color:var(--primary);border:1.5px solid var(--primary)}
+.bagGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.bagGrid.two{grid-template-columns:1fr 1fr}
+.bagBtn{border:2px solid transparent;background:var(--bg);color:var(--text)}
+.yellow{background:var(--yellowL);border-color:var(--yellow)}.greenBag{background:var(--greenL);border-color:var(--green)}.redBag{background:var(--redL);border-color:var(--red)}.purpleBag{background:var(--purpleL);border:2px solid var(--purple);color:var(--purple)}
+.selected.yellow{background:var(--yellow)}.selected.greenBag{background:var(--green);color:white}.selected.redBag{background:var(--red);color:white}.selected.purpleBag{background:var(--purple);color:white}
+.exchange,.medRow{background:var(--bg);border:1.5px solid var(--border);border-radius:13px;padding:12px;margin-bottom:10px}
+.exchange h3,.medRow h3{font-size:.86rem;color:var(--primary);margin-bottom:9px;text-transform:uppercase}
+.ufBox{background:white;border:1.5px solid var(--border);border-radius:9px;padding:8px;font-weight:900;color:var(--primary)}
+.summary{background:var(--light);border:1.5px solid var(--primary);border-radius:12px;padding:12px;text-align:center;font-weight:900;color:var(--primary);margin-top:10px}
+.symGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.toggle{background:var(--bg);border:1.5px solid var(--border);text-align:left}.toggle.active{background:var(--light);border-color:var(--primary);color:var(--primary)}
+.actionGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.save{background:var(--primary);color:white}.print{background:var(--pink);color:white}
+.historyCard{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:10px;margin-top:8px}.pill{display:inline-block;background:var(--light);color:var(--primary);border-radius:20px;padding:4px 9px;font-size:.72rem;font-weight:800;margin:2px}
+.testBox{background:var(--greenL);border:1.5px solid var(--green);color:#0a7a4a;border-radius:12px;padding:10px;font-weight:800;margin-top:8px;display:none}
+@media(max-width:640px){.grid3,.grid2{grid-template-columns:1fr}.btnGrid{grid-template-columns:1fr 1fr}.actionGrid{grid-template-columns:1fr}.bagGrid,.bagGrid.two{grid-template-columns:1fr}}
+@media print{body{background:white}.history,.actionGrid,.tester{display:none}.card,header{box-shadow:none}}
+</style>
+</head>
+<body>
+<header><h1>ð BeaHive Caregiver Control</h1><p>Soft but clear PD + BP + Medication Tracker</p></header>
+<div class="note"><b>Caregiver note:</b> This tracker is for organizing home information only. It does not replace the PD nurse, nephrologist, cardiology team, or emergency instructions.</div>
 
-/
+<div class="card tester">
+  <div class="section-title">â Button Test</div>
+  <div class="section-sub">Tap this first. If the green message appears, your browser is allowing the tracker buttons to work.</div>
+  <button type="button" class="outlineBtn" onclick="testButtons()" style="width:100%">Test Buttons</button>
+  <div id="testResult" class="testBox">â Buttons are working on this browser.</div>
+</div>
 
-🧪 Prescription Bag Setup
-Heater bag can be selected. Bottom bag is chosen based on BP, weight, swelling, and how he feels. Purple Extraneal is tracked separately.
-Heater Bag
-🟡 Yellow
-1.5%
-🟢 Green
-2.5%
-Bottom Bag Decision
-🟡 Yellow
-1.5%
-🟢 Green
-2.5%
-🔴 Red
-4.25%
-Purple Extraneal / Icodextrin
-Long dwell he carries during the day
-      Yes
-      No
-    
-Extraneal Volume
-ml
-☀️ Morning Results
-Use when treatment ends.
-End Time
-Morning Weight
-lbs
-Morning BP
+<div class="card">
+  <div class="row"><div class="label">ð Treatment Date</div><input type="date" id="entryDate"></div>
+</div>
 
-/
+<div class="card">
+  <div class="section-title">ð Night Setup / Pre-Treatment</div>
+  <div class="section-sub">Use before starting the cycler at night.</div>
+  <div class="row"><div class="label">Start Time</div><input type="time" id="startTime"></div>
+  <div class="row"><div class="label">Pre Weight <small>Before connecting</small></div><div><input type="number" id="preWeight" step="0.1" placeholder="lbs" oninput="checkWeight()"> lbs</div></div>
+  <div class="row"><div class="label">Dry Weight</div><div><input type="number" id="dryWeight" step="0.1" placeholder="lbs" oninput="checkWeight()"> lbs</div></div>
+  <div class="row"><div class="label">Pre BP</div><div class="bp"><input type="number" id="bpSysPre" placeholder="120" oninput="checkBP('Pre')"> / <input type="number" id="bpDiaPre" placeholder="80" oninput="checkBP('Pre')"></div></div>
+  <div class="alert" id="bpAlertPre"></div>
+  <div class="alert" id="weightAlert"></div>
+</div>
 
-Heart Rate
-bpm
-🩺 Cycler / Machine Summary
-This is the main PD result section for nightly cycler numbers.
-I-DRAIN / INITIAL DRAIN
-TOTAL UF
-LOST DWELL
-TOTAL THERAPY TIME
-AVERAGE DWELL TIME
-💊 Detailed Medication Log
-Use for medication timing, dosage, BP before dose, and BP 1–2 hours after dose.
-+ Carvedilol 25mg
-+ Entresto
+<div class="card">
+  <div class="section-title">ð§ª Prescription Bag Setup</div>
+  <div class="section-sub">Heater bag can be selected. Bottom bag is chosen based on BP, weight, swelling, and how he feels. Purple Extraneal is tracked separately.</div>
 
-+ Add Medication
-💧 Fluid Intake
-Track in cups, ounces, bottles, or ml.
-0 ml
-0 oz
-+ ½ cup
-4 oz
-+ 1 cup
-8 oz
-+ Bottle
-12 oz
-+ 500 ml
-Reset Fluid
-🔬 Urine Output / Kt/V
-Optional unless clinic asks for urine collection or Kt/V testing.
-Kt/V Collection Day?
-NoYes
-Total Urine Output
-ml
-🔄 Optional Exchange / Cycle Details
-Use only for extra details: alarms, bad drain, manual exchange, or a specific cycle problem.
+  <div style="margin:10px 0 6px;font-size:.78rem;font-weight:900;color:var(--muted)">Heater Bag</div>
+  <div class="bagGrid two">
+    <button type="button" class="bagBtn yellow" onclick="selectHeaterBag('Yellow 1.5%',this)">ð¡ Yellow<br>1.5%</button>
+    <button type="button" class="bagBtn greenBag selected" onclick="selectHeaterBag('Green 2.5%',this)">ð¢ Green<br>2.5%</button>
+  </div>
+  <input type="hidden" id="heaterBag" value="Green 2.5%">
 
-+ Add Exchange / Cycle Note
-Calculated Exchange UF: 0 ml
-🌡️ Symptoms
-😵 Dizziness
-🤕 Headache
-🤢 Nausea
-😴 Tired
-🦶 Swelling
-😮‍💨 Breathless
-😣 Stomach pain
-😊 Good day
-📝 Notes
-💾 Save Entry
-🖨️ Print / Save PDF
-📄 Export CSV
-🧹 Clear Form
-📋 Recent Entries
-No entries yet.
+  <div style="margin:12px 0 6px;font-size:.78rem;font-weight:900;color:var(--muted)">Bottom Bag Decision</div>
+  <div class="bagGrid">
+    <button type="button" class="bagBtn yellow" onclick="selectBottomBag('Yellow 1.5%',this)">ð¡ Yellow<br>1.5%</button>
+    <button type="button" class="bagBtn greenBag" onclick="selectBottomBag('Green 2.5%',this)">ð¢ Green<br>2.5%</button>
+    <button type="button" class="bagBtn redBag" onclick="selectBottomBag('Red 4.25%',this)">ð´ Red<br>4.25%</button>
+  </div>
+  <input type="hidden" id="bottomBag">
+  <textarea id="bagReason" placeholder="Why this bottom bag? BP, weight, swelling, shortness of breath, feeling too dry, nurse instructions..."></textarea>
+
+  <div class="row">
+    <div class="label">Purple Extraneal / Icodextrin <small>Long dwell he carries during the day</small></div>
+    <select id="extranealUsed">
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </div>
+  <div class="row">
+    <div class="label">Extraneal Volume</div>
+    <div><input type="number" id="extranealVolume" value="1500"> ml</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">âï¸ Morning Results</div>
+  <div class="section-sub">Use when treatment ends.</div>
+  <div class="row"><div class="label">End Time</div><input type="time" id="endTime"></div>
+  <div class="row"><div class="label">Morning Weight</div><div><input type="number" id="morningWeight" step="0.1" placeholder="lbs"> lbs</div></div>
+  <div class="row"><div class="label">Morning BP</div><div class="bp"><input type="number" id="bpSysAM" placeholder="120" oninput="checkBP('AM')"> / <input type="number" id="bpDiaAM" placeholder="80" oninput="checkBP('AM')"></div></div>
+  <div class="alert" id="bpAlertAM"></div>
+  <div class="row"><div class="label">Heart Rate</div><div><input type="number" id="heartRate" placeholder="70"> bpm</div></div>
+</div>
+
+<div class="card">
+  <div class="section-title">ð©º Cycler / Machine Summary</div>
+  <div class="section-sub">This is the main PD result section for nightly cycler numbers.</div>
+  <div class="grid3">
+    <div class="field"><label>I-Drain / Initial Drain</label><input type="number" id="initialDrain" placeholder="ml"></div>
+    <div class="field"><label>Total UF</label><input type="number" id="machineUF" placeholder="ml"></div>
+    <div class="field"><label>Lost Dwell</label><input type="text" id="lostDwell" placeholder="0:00"></div>
+  </div>
+  <div class="grid2" style="margin-top:8px">
+    <div class="field"><label>Total Therapy Time</label><input type="text" id="therapyTime" placeholder="8:30"></div>
+    <div class="field"><label>Average Dwell Time</label><input type="text" id="avgDwell" placeholder="1:20"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">ð Detailed Medication Log</div>
+  <div class="section-sub">Use for medication timing, dosage, BP before dose, and BP 1â2 hours after dose.</div>
+  <div style="margin-bottom:8px" class="grid2">
+    <button type="button" class="outlineBtn" onclick="addPresetMed('Carvedilol','25 mg')">+ Carvedilol 25mg</button>
+    <button type="button" class="outlineBtn" onclick="addPresetMed('Entresto','')">+ Entresto</button>
+  </div>
+  <div id="medList"></div>
+  <button type="button" class="outlineBtn" onclick="addMedRow()" style="width:100%">+ Add Medication</button>
+</div>
+
+<div class="card">
+  <div class="section-title">ð§ Fluid Intake</div>
+  <div class="section-sub">Track in cups, ounces, bottles, or ml.</div>
+  <div class="fluidBox"><div class="fluidAmt" id="fluidMl">0 ml</div><div id="fluidOz">0 oz</div></div>
+  <div class="btnGrid">
+    <button type="button" class="fluidBtn" onclick="addFluid(118)">+ Â½ cup<br><small>4 oz</small></button>
+    <button type="button" class="fluidBtn" onclick="addFluid(237)">+ 1 cup<br><small>8 oz</small></button>
+    <button type="button" class="fluidBtn" onclick="addFluid(355)">+ Bottle<br><small>12 oz</small></button>
+    <button type="button" class="fluidBtn" onclick="addFluid(500)">+ 500 ml</button>
+  </div>
+  <button type="button" class="outlineBtn" onclick="resetFluid()" style="width:100%;margin-top:8px">Reset Fluid</button>
+</div>
+
+<div class="card">
+  <div class="section-title">ð¬ Urine Output / Kt/V</div>
+  <div class="section-sub">Optional unless clinic asks for urine collection or Kt/V testing.</div>
+  <div class="row"><div class="label">Kt/V Collection Day?</div><select id="ktvDay"><option>No</option><option>Yes</option></select></div>
+  <div class="row"><div class="label">Total Urine Output</div><div><input type="number" id="urineOutput" placeholder="ml"> ml</div></div>
+</div>
+
+<div class="card">
+  <div class="section-title">ð Optional Exchange / Cycle Details</div>
+  <div class="section-sub">Use only for extra details: alarms, bad drain, manual exchange, or a specific cycle problem.</div>
+  <div id="exchangeList"></div>
+  <button type="button" class="outlineBtn" onclick="addExchange()" style="width:100%">+ Add Exchange / Cycle Note</button>
+  <div class="summary" id="exchangeUF">Calculated Exchange UF: 0 ml</div>
+  <div class="alert danger" id="cloudyAlert">â ï¸ Cloudy or bloody fluid noted. Follow clinic instructions immediately.</div>
+</div>
+
+<div class="card">
+  <div class="section-title">ð¡ï¸ Symptoms</div>
+  <div class="symGrid">
+    <button type="button" class="toggle" data-sym="Dizziness" onclick="toggle(this)">ðµ Dizziness</button>
+    <button type="button" class="toggle" data-sym="Headache" onclick="toggle(this)">ð¤ Headache</button>
+    <button type="button" class="toggle" data-sym="Nausea" onclick="toggle(this)">ð¤¢ Nausea</button>
+    <button type="button" class="toggle" data-sym="Tired" onclick="toggle(this)">ð´ Tired</button>
+    <button type="button" class="toggle" data-sym="Swelling" onclick="toggle(this)">ð¦¶ Swelling</button>
+    <button type="button" class="toggle" data-sym="Shortness of breath" onclick="toggle(this)">ð®âð¨ Breathless</button>
+    <button type="button" class="toggle" data-sym="Stomach pain" onclick="toggle(this)">ð£ Stomach pain</button>
+    <button type="button" class="toggle" data-sym="Good day" onclick="toggle(this)">ð Good day</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">ð Notes</div>
+  <textarea id="notes" placeholder="BP/med decisions, PD alarms, how he felt, nurse calls, swelling, appetite, unusual symptoms..."></textarea>
+</div>
+
+<div class="actionGrid">
+  <button type="button" class="save" onclick="saveEntry()">ð¾ Save Entry</button>
+  <button type="button" class="print" onclick="window.print()">ð¨ï¸ Print / Save PDF</button>
+  <button type="button" class="save" style="background:#0f8f70" onclick="exportCSV()">ð Export CSV</button>
+  <button type="button" class="outlineBtn" onclick="clearForm()">ð§¹ Clear Form</button>
+</div>
+
+<div class="card history">
+  <div class="section-title">ð Recent Entries</div>
+  <div id="historyList">No entries yet.</div>
+</div>
+
+<script>
+let fluid=0, medCount=0, exchCount=0;
+document.getElementById('entryDate').value=new Date().toISOString().split('T')[0];
+
+function testButtons(){document.getElementById('testResult').style.display='block';}
+function toggle(btn){btn.classList.toggle('active')}
+function addFluid(ml){fluid+=ml; updateFluid()}
+function resetFluid(){fluid=0; updateFluid()}
+function updateFluid(){document.getElementById('fluidMl').textContent=fluid+' ml';document.getElementById('fluidOz').textContent=Math.round(fluid/29.5735)+' oz'}
+
+function checkBP(type){
+ let sys=parseFloat(document.getElementById('bpSys'+type).value), dia=parseFloat(document.getElementById('bpDia'+type).value), box=document.getElementById('bpAlert'+type);
+ if(!sys||!dia){box.className='alert';box.textContent='';return}
+ box.className='alert show';
+ if(sys>=180||dia>=120){box.classList.add('danger');box.textContent='ð¨ Very high BP range. Follow clinic emergency instructions.'}
+ else if(sys<90||dia<60){box.classList.add('danger');box.textContent='ð¨ Low BP range. Watch symptoms and follow clinic instructions.'}
+ else if(sys>=140||dia>=90){box.classList.add('warn');box.textContent='â ï¸ Elevated BP range. Track with meds and symptoms.'}
+ else if(sys<100){box.classList.add('warn');box.textContent='â ï¸ Lower BP range. Watch dizziness/too-dry signs.'}
+ else{box.classList.add('good');box.textContent='â BP not in high/low warning range.'}
+}
+
+function checkWeight(){
+ let w=parseFloat(document.getElementById('preWeight').value), d=parseFloat(document.getElementById('dryWeight').value), box=document.getElementById('weightAlert');
+ if(!w||!d){box.className='alert';box.textContent='';return}
+ let diff=w-d; box.className='alert show';
+ if(diff>4.4){box.classList.add('warn');box.textContent='â ï¸ '+diff.toFixed(1)+' lbs above dry weight. Track swelling/BP and follow clinic guidance.'}
+ else if(diff<-2.2){box.classList.add('warn');box.textContent='ð§ '+Math.abs(diff).toFixed(1)+' lbs below dry weight. Watch low BP/dizziness.'}
+ else{box.classList.add('good');box.textContent='â Weight close to dry weight.'}
+}
+
+function selectHeaterBag(val,btn){
+ document.querySelectorAll('.bagGrid.two .bagBtn').forEach(b=>b.classList.remove('selected'));
+ btn.classList.add('selected'); document.getElementById('heaterBag').value=val;
+}
+function selectBottomBag(val,btn){
+ let buttons = btn.parentElement.querySelectorAll('.bagBtn');
+ buttons.forEach(b=>b.classList.remove('selected'));
+ btn.classList.add('selected'); document.getElementById('bottomBag').value=val;
+}
+
+
+function addPresetMed(name,dose){
+ addMedRow();
+ document.getElementById('medName'+medCount).value=name;
+ document.getElementById('medDose'+medCount).value=dose;
+}
+
+function removeMedRow(id){
+ const row=document.getElementById('med'+id);
+ if(row){ row.remove(); }
+}
+
+function addMedRow(){
+ medCount++;
+ let div=document.createElement('div'); div.className='medRow'; div.id='med'+medCount;
+ div.innerHTML='<h3>Medication '+medCount+'</h3>\
+ <div class="grid3">\
+  <div class="field"><label>Name</label><input id="medName'+medCount+'" placeholder="Carvedilol / Entresto"></div>\
+  <div class="field"><label>Dose</label><input id="medDose'+medCount+'" placeholder="25 mg / 1/2 tab"></div>\
+  <div class="field"><label>Time Given</label><input type="time" id="medTime'+medCount+'"></div>\
+ </div>\
+ <div class="grid2" style="margin-top:8px">\
+  <div class="field"><label>BP Before Dose</label><input id="medBPBefore'+medCount+'" placeholder="168/102"></div>\
+  <div class="field"><label>BP 1-2 Hrs After</label><input id="medBPAfter'+medCount+'" placeholder="142/88"></div>\
+ </div>\
+ <div class="grid2" style="margin-top:8px">\
+  <div class="field"><label>After-Dose Time</label><input type="time" id="medAfterTime'+medCount+'"></div>\
+  <div class="field"><label>Given / Held / Changed</label><select id="medStatus'+medCount+'"><option>Given</option><option>Held</option><option>Changed</option><option>Skipped</option></select></div>\
+ </div>\
+ <div class="grid2" style="margin-top:8px">\
+  <div class="field"><label>Symptoms After Dose</label><select id="medAfterSymptoms'+medCount+'"><option>No change</option><option>Better</option><option>Dizzy</option><option>Weak</option><option>Sleepy</option><option>Short of breath</option><option>Other</option></select></div>\
+  <div class="field"><label>Med Purpose</label><select id="medPurpose'+medCount+'"><option>BP / Heart</option><option>Fluid</option><option>Diabetes</option><option>Binder</option><option>Other</option></select></div>\
+ </div>\
+ <textarea id="medNote'+medCount+'" placeholder="Why given/held, BP response, symptoms, new instructions..."></textarea> <button type="button" class="clear" onclick="removeMedRow('+medCount+')" style="width:100%;margin-top:8px">Remove Medication</button>';
+ document.getElementById('medList').appendChild(div);
+}
+function addExchange(){
+ exchCount++;
+ let div=document.createElement('div'); div.className='exchange'; div.id='ex'+exchCount;
+ div.innerHTML='<h3>Exchange / Cycle '+exchCount+'</h3><div class="grid3"><div class="field"><label>Fill Volume</label><input type="number" id="fill'+exchCount+'" placeholder="2400" oninput="calcUF()"></div><div class="field"><label>Drain Volume</label><input type="number" id="drain'+exchCount+'" placeholder="2500" oninput="calcUF()"></div><div class="field"><label>UF</label><div class="ufBox" id="uf'+exchCount+'">0 ml</div></div></div><div class="grid2" style="margin-top:8px"><div class="field"><label>Dwell Time</label><input id="dwell'+exchCount+'" placeholder="1:20"></div><div class="field"><label>Appearance</label><select id="clarity'+exchCount+'" onchange="checkClarity()"><option></option><option>Clear</option><option>Cloudy</option><option>Bloody</option></select></div></div><textarea id="exNote'+exchCount+'" placeholder="Alarm, slow drain, bypass, manual drain, notes..."></textarea>';
+ document.getElementById('exchangeList').appendChild(div);
+}
+
+function calcUF(){
+ let total=0;
+ for(let i=1;i<=exchCount;i++){
+  let f=parseFloat((document.getElementById('fill'+i)||{}).value)||0;
+  let d=parseFloat((document.getElementById('drain'+i)||{}).value)||0;
+  let uf=d-f; total+=uf;
+  let u=document.getElementById('uf'+i); if(u)u.textContent=uf+' ml';
+ }
+ document.getElementById('exchangeUF').textContent='Calculated Exchange UF: '+total+' ml';
+ return total;
+}
+
+function checkClarity(){
+ let concern=false;
+ for(let i=1;i<=exchCount;i++){
+  let c=document.getElementById('clarity'+i);
+  if(c&&(c.value==='Cloudy'||c.value==='Bloody')) concern=true;
+ }
+ document.getElementById('cloudyAlert').classList.toggle('show',concern);
+}
+
+function gatherMeds(){
+ let meds=[];
+ for(let i=1;i<=medCount;i++){
+  if(document.getElementById('med'+i)){
+   meds.push({
+    name:document.getElementById('medName'+i).value,
+    dose:document.getElementById('medDose'+i).value,
+    time:document.getElementById('medTime'+i).value,
+    bpBefore:document.getElementById('medBPBefore'+i).value,
+    bpAfter:document.getElementById('medBPAfter'+i).value,
+    afterTime:document.getElementById('medAfterTime'+i).value,
+    status:document.getElementById('medStatus'+i).value,
+    afterSymptoms:document.getElementById('medAfterSymptoms'+i).value,
+    purpose:document.getElementById('medPurpose'+i).value,
+    note:document.getElementById('medNote'+i).value
+   });
+  }
+ }
+ return meds;
+}
+function gatherExchanges(){
+ let ex=[];
+ for(let i=1;i<=exchCount;i++){
+  if(document.getElementById('ex'+i)){
+   let fill=(document.getElementById('fill'+i)||{}).value || '';
+   let drain=(document.getElementById('drain'+i)||{}).value || '';
+   ex.push({
+    fill:fill,
+    drain:drain,
+    uf:(parseFloat(drain)||0)-(parseFloat(fill)||0),
+    dwell:(document.getElementById('dwell'+i)||{}).value || '',
+    clarity:(document.getElementById('clarity'+i)||{}).value || '',
+    note:(document.getElementById('exNote'+i)||{}).value || ''
+   });
+  }
+ }
+ return ex;
+}
+
+function exportCSV(){
+ let all=JSON.parse(localStorage.getItem('beahivePersonalPDv6')||'[]');
+ if(!all.length){ alert('No saved entries to export yet.'); return; }
+
+ let headers=[
+  'Date','Start Time','End Time','Pre Weight','Dry Weight','Morning Weight',
+  'Pre BP','Morning BP','Heart Rate','Heater Bag','Bottom Bag','Bag Reason',
+  'Extraneal','Extraneal Volume','Initial Drain','Machine UF','Lost Dwell',
+  'Therapy Time','Average Dwell','Fluid ml','Fluid oz','Kt/V Day','Urine Output',
+  'Medication BP Log','Symptoms','Notes'
+ ];
+
+ let rows=[headers.map(csvSafe).join(',')];
+
+ all.forEach(e=>{
+  let meds=(e.meds||[]).map(m =>
+    `${m.time || ''} ${m.name || ''} ${m.dose || ''} ${m.status || ''} BeforeBP:${m.bpBefore || ''} AfterBP:${m.bpAfter || ''} AfterTime:${m.afterTime || ''} Symptoms:${m.afterSymptoms || ''} ${m.note || ''}`
+  ).join(' | ');
+
+  rows.push([
+    e.date,e.startTime,e.endTime,e.preWeight,e.dryWeight,e.morningWeight,
+    e.bpPre,e.bpAM,e.heartRate,e.heaterBag,e.bottomBag,e.bagReason,
+    e.extraneal,e.extranealVolume,e.initialDrain,e.machineUF,e.lostDwell,
+    e.therapyTime,e.avgDwell,e.fluid,Math.round((e.fluid||0)/29.5735),
+    e.ktvDay,e.urineOutput,meds,(e.symptoms||[]).join(' | '),e.notes
+  ].map(csvSafe).join(','));
+ });
+
+ let blob=new Blob([rows.join('\\n')],{type:'text/csv'});
+ let url=URL.createObjectURL(blob);
+ let a=document.createElement('a');
+ a.href=url;
+ a.download='beahive_pd_med_bp_log.csv';
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+ URL.revokeObjectURL(url);
+}
+
+function clearForm(){
+ if(!confirm('Clear form fields? Saved history will stay.')) return;
+ document.querySelectorAll('input[type="number"], input[type="text"], input[type="time"], textarea').forEach(el=>{
+   if(el.id==='extranealVolume') el.value='1500';
+   else el.value='';
+ });
+ document.getElementById('entryDate').value=new Date().toISOString().split('T')[0];
+ fluid=0; updateFluid();
+ document.querySelectorAll('.toggle.active').forEach(b=>b.classList.remove('active'));
+ document.getElementById('bottomBag').value='';
+ document.querySelectorAll('.bagGrid:not(.two) .bagBtn').forEach(b=>b.classList.remove('selected'));
+ document.getElementById('medList').innerHTML='';
+ medCount=0;
+ addMedRow();
+ document.getElementById('exchangeList').innerHTML='';
+ exchCount=0;
+ calcUF();
+}
+
+function renderHistory(){
+ let all=JSON.parse(localStorage.getItem('beahivePersonalPDv6')||'[]'), h=document.getElementById('historyList');
+ if(!all.length){h.textContent='No entries yet.';return}
+ h.innerHTML=all.slice(0,10).map(e=>'<div class="historyCard"><b>ð '+e.date+'</b><br><span class="pill">Pre BP '+e.bpPre+'</span><span class="pill">AM BP '+e.bpAM+'</span><span class="pill">UF '+(e.machineUF||0)+' ml</span><span class="pill">Heater '+(e.heaterBag||'not set')+'</span><span class="pill">Bottom '+(e.bottomBag||'not set')+'</span><span class="pill">Purple '+e.extraneal+' '+(e.extranealVolume||'')+'ml</span><span class="pill">Meds '+e.meds.length+'</span></div>').join('');
+}
+
+renderHistory();
+</script>
+</body>
+</html>
